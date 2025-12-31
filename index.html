@@ -91,7 +91,7 @@
 腿都走疼了，还有老婆给我按脚，不嫌弃我的脚丫子，那时候觉得自己是世界上最幸福的男人一个(没有说现在不是的意思)
 你躺在我怀里睡觉的时候，也是很可爱的，完全就是世界上最可爱的宝宝一个，谁能忍住不亲一嘴？
 
-再见面的时候已经是国庆了，干了个爽，老婆也是不辞辛苦不远万里的来到我身边，国庆加班的疲劳一扫而空，这个国庆也过得很充实很开心
+再见面的时候已经是国庆了，干了个爽，老婆也是不辞辛苦不远万里的来到我身边，国庆加班的疲劳一扫空，这个国庆也过得很充实很开心
 在广州生活这么久，我就天天呆在自己家里那个一亩三分地，没有老婆和我一起，我可能很久很久都不会来到这些地方，永庆坊这个地方拍照有说法的，没有美颜的照片一下就给你否了，但是在我心里，有没有美颜对我来说，你的美丽都是无可挑剔的。
 后来我们一路从永庆坊走到圣心大教堂，在走到上下九，走到北京路，去看到了这个打卡点，经常有在抖音刷到，但是和你一起来到这个地方，也是很有意义的。
 和老婆一起吃火锅，老婆说喜欢和我并排坐，喜欢把脚搭在我的腿上吃东西，这个我也是有一直记在心里
@@ -103,11 +103,7 @@
 
 还有很多第一次..已经写不过来了，手机里全是你的照片，不过我想说的是，我很感谢也很珍惜有你，我还有更多的第一次想要和你尝试，还有很多的姿势想要和你体验，我对你的爱永远是加法，你可以随时向我确认我的决心。谢谢你看到这里。
 
-爱你的东~
-
-
-
-`,
+爱你的东~`,
 
             photoTriggers: [
                 { keyword: "第一次给你送花", url: "flower.jpg" }, 
@@ -126,6 +122,16 @@
                 { keyword: "永恒的爱", url: "yhda.jpg" }
             ]
         };
+
+        // --- 1. 新增：图片预加载逻辑 ---
+        // 在网页加载时就把照片下好，防止打字打到了照片还没出来
+        function preloadImages() {
+            config.photoTriggers.forEach(item => {
+                const img = new Image();
+                img.src = item.url;
+            });
+        }
+        window.addEventListener('load', preloadImages);
 
         const starContainer = document.getElementById('star-container');
         const words = ["东", "欣", "2026", "✨", "❤️"];
@@ -162,7 +168,6 @@
             }
         }
 
-        // --- 核心修改：2.5秒总时长控制 ---
         function showPopPhoto(url, key) {
             const overlay = document.getElementById('photo-overlay');
             const img = document.getElementById('pop-photo');
@@ -171,7 +176,6 @@
             overlay.classList.add('show'); 
             shownPhotos.add(key);
 
-            // 2.0s后触发淡出，加上CSS中的0.5s淡出时间，总时长正好 2.5s
             setTimeout(() => {
                 overlay.classList.remove('show');
             }, 2000); 
@@ -181,8 +185,22 @@
         const audio = document.getElementById('bgAudio');
         const musicCtrl = document.getElementById('music-control');
 
+        // --- 2. 修改：信封点击逻辑（增加跨年时间锁） ---
         env.onclick = function(e) {
             if (this.classList.contains('is-open') || e.target.id === 'close-btn') return;
+            
+            // 【时间检查】
+            const now = new Date();
+            const targetDate = new Date('2026/01/01 00:00:00'); // 解锁时间
+            
+            if (now < targetDate) {
+                const diff = targetDate - now;
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                alert(`宝贝别急，这是给你的2026新年惊喜。\n距离零点解锁还剩：${hours}小时${mins}分钟 ✨`);
+                return; 
+            }
+
             this.classList.add('is-open');
             document.getElementById('env-label').style.display = 'none';
             document.getElementById('letter-content').style.display = 'flex';

@@ -4,41 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>2026 新年信笺</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
             --paper-color: #fff9e6;
             --env-color: #c0392b;
             --env-flap: #e74c3c;
-            --bg-1: #fdaffa; --bg-2: #b4df9b; --bg-3: #b6cdad;
+            /* 固定为你指定的色号 */
+            --bg-1: #fdaffa; 
+            --bg-2: #b4df9b; 
+            --bg-3: #b6cdad;
         }
 
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; display: flex; justify-content: center; align-items: center;
-            touch-action: none; /* 防止手机端默认缩放 */
+            overflow: hidden; display: flex; justify-content: center; align-items: center; 
         }
 
-        /* 渐变背景 */
-        #bg-wrapper {
-            position: fixed; top: -10%; left: -10%; width: 120%; height: 120%;
-            z-index: -2; transition: transform 0.1s ease-out;
-        }
+        /* --- 渐变波浪背景 --- */
         .wave-bg {
+            position: fixed; top: 0; left: 0; 
             width: 400%; height: 100%;
             background: linear-gradient(90deg, var(--bg-1), var(--bg-2), var(--bg-3), var(--bg-1));
-            background-size: 25% 100%; animation: waveFlow 15s linear infinite;
+            background-size: 25% 100%;
+            z-index: -2;
+            animation: waveFlow 15s linear infinite;
         }
         @keyframes waveFlow { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        /* 星空文字 */
-        #star-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-        .star-text { position: absolute; color: rgba(255,255,255,0.8); font-weight: bold; opacity: 0; animation: twinkle var(--duration) ease-in-out infinite; }
-        @keyframes twinkle { 0%, 100% { opacity: 0.1; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.1); } }
+        /* --- 一闪一闪星空层 --- */
+        #star-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; pointer-events: none;
+        }
+        .star-text {
+            position: absolute; color: rgba(255,255,255,0.8); font-weight: bold;
+            opacity: 0; animation: twinkle var(--duration) ease-in-out infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.1; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
 
-        /* 信封 UI 适配手机宽度 */
+        /* --- 信封 UI --- */
         .envelope-container {
-            position: relative; width: 85vw; height: 55vw; max-width: 320px; max-height: 200px;
+            position: relative; width: 280px; height: 180px;
             background: var(--env-color); cursor: pointer; z-index: 100;
             transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 15px 45px rgba(0,0,0,0.2);
@@ -46,151 +55,121 @@
         }
         .envelope-container::before {
             content: ""; position: absolute; top: 0; left: 0;
-            border-left: 42.5vw solid transparent; border-right: 42.5vw solid transparent;
-            border-top: 30vw solid var(--env-flap); transform-origin: top; transition: 0.5s; z-index: 4;
+            border-left: 140px solid transparent; border-right: 140px solid transparent;
+            border-top: 100px solid var(--env-flap);
+            transform-origin: top; transition: 0.5s; z-index: 4;
         }
-        @media (min-width: 320px) {
-            .envelope-container::before { border-left-width: 160px; border-right-width: 160px; border-top-width: 110px; }
-        }
-
-        .seal {
-            position: absolute; bottom: 15%; width: 60px; height: 60px; background: #a52a2a;
-            border-radius: 50%; z-index: 10; display: flex; justify-content: center; align-items: center;
-            color: #ffd700; font-weight: bold; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-            transition: 0.3s;
-        }
-        /* 长按时的波纹效果 */
-        .seal.pressing { transform: scale(0.9); background: #802020; box-shadow: 0 0 20px #ffd700; }
-
-        /* 展开后适配全屏 */
+        /* 手机端适配宽度 */
         .envelope-container.is-open {
-            width: 90vw; height: 80vh; max-width: 90vw; max-height: 85vh;
-            background: var(--paper-color); cursor: default; flex-direction: column; 
-            padding: 30px 20px; box-sizing: border-box; border-radius: 12px;
+            width: 85vw; height: 70vh; background: var(--paper-color);
+            cursor: default; flex-direction: column; padding: 40px 20px; box-sizing: border-box; border-radius: 8px;
         }
-        .envelope-container.is-open::before, .envelope-container.is-open .seal { opacity: 0; pointer-events: none; }
+        .envelope-container.is-open::before { transform: rotateX(180deg); opacity: 0; }
 
-        #typewriter { font-size: 1rem; color: #333; line-height: 1.8; text-align: center; white-space: pre-wrap; margin-top: 15px; overflow-y: auto; }
-        .gift-box { display: none; flex-direction: column; align-items: center; margin-top: 20px; cursor: pointer; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        #typewriter { font-size: 1.15rem; color: #333; line-height: 2; text-align: center; white-space: pre-wrap; margin-top: 20px; }
         
-        #close-btn { position: absolute; top: 10px; right: 10px; font-size: 24px; border: none; background: none; color: #999; display: none; }
+        #close-btn { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; background: none; border: none; color: #999; display: none; }
         .envelope-container.is-open #close-btn { display: block; }
 
-        #music-control { position: fixed; top: 15px; right: 15px; width: 36px; height: 36px; z-index: 1000; border-radius: 50%; background: rgba(255,255,255,0.3); display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px); border: 1px solid #fff; }
+        #music-control {
+            position: fixed; top: 20px; right: 20px; width: 40px; height: 40px; z-index: 1000;
+            cursor: pointer; border-radius: 50%; background: rgba(255,255,255,0.3);
+            display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
         #music-control.playing { animation: rotateDisk 5s linear infinite; }
         @keyframes rotateDisk { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <div id="bg-wrapper">
-        <div class="wave-bg"></div>
-    </div>
+    <div class="wave-bg"></div>
     <div id="star-container"></div>
+
     <audio id="bgAudio" src="bg-music.mp3" loop></audio>
     <div id="music-control">♪</div>
 
     <div class="envelope-container" id="mainEnvelope">
-        <span id="env-label" style="color:#FFD700; z-index:5; font-size: 1rem; margin-bottom: 40px;">长按火漆印章开启</span>
-        <div class="seal" id="sealBtn">福</div>
+        <span id="env-label" style="color:#FFD700; z-index:5; font-size: 1.2rem; letter-spacing: 2px;">开启 2026 祝福</span>
         <button id="close-btn">✕</button>
         <div id="letter-content" style="display:none; width:100%;">
-            <h2 style="color:var(--env-color); text-align:center; margin:0; font-size: 1.4rem;">致：东、欣</h2>
+            <h2 style="color:var(--env-color); text-align:center; margin-top:0;">致：东、欣</h2>
             <div id="typewriter"></div>
-            <div class="gift-box" id="giftBtn">
-                <span style="font-size:40px;">🎁</span>
-                <span style="font-size:12px; color:var(--env-color); font-weight:bold;">新年好礼 (点击)</span>
-            </div>
         </div>
     </div>
 
     <script>
-        const config = { text: "亲爱的朋友：\n\n见字如晤。\n新年的钟声即将敲响，愿这封信带去最温润的祝福。\n生活如诗，岁月如画。\n愿 2026 年的你，万事胜意，不负韶华。" };
+        const config = {
+            text: "亲爱的朋友：\n\n新年的钟声即将敲响，所有的过往皆为序章。\n愿这封信随着温柔的波浪，带去我最真挚的祝福。\n生活如诗，岁月如画。\n愿 2026 年的你，万事胜意，不负韶华。"
+        };
 
-        // 1. 手机端背景位移 (陀螺仪轻微交互)
-        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            // iOS 需要授权
-            document.body.addEventListener('click', () => {
-                DeviceOrientationEvent.requestPermission();
-            }, { once: true });
-        }
-        window.addEventListener('deviceorientation', (e) => {
-            const tiltX = Math.floor(e.gamma) / 3; // 左右倾斜
-            const tiltY = Math.floor(e.beta) / 3;  // 前后倾斜
-            document.getElementById('bg-wrapper').style.transform = `translate(${tiltX}px, ${tiltY}px)`;
-        });
-
-        // 2. 星空生成
+        // 1. 生成星空文字
         const starContainer = document.getElementById('star-container');
-        for (let i = 0; i < 40; i++) {
+        const words = ["东", "欣", "2026", "✨", "❤️"];
+        for (let i = 0; i < 50; i++) {
             const s = document.createElement('div');
             s.className = 'star-text';
-            s.innerText = ["✨", "❤️", "2026"][Math.floor(Math.random() * 3)];
-            s.style.left = Math.random() * 100 + "%"; s.style.top = Math.random() * 100 + "%";
+            s.innerText = words[Math.floor(Math.random() * words.length)];
+            s.style.left = Math.random() * 100 + "%";
+            s.style.top = Math.random() * 100 + "%";
             s.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
             s.style.setProperty('--delay', (Math.random() * 5) + 's');
             starContainer.appendChild(s);
         }
 
-        // 3. 长按开启逻辑
-        const sealBtn = document.getElementById('sealBtn');
-        const env = document.getElementById('mainEnvelope');
-        let pressTimer;
-
-        function startPress() {
-            sealBtn.classList.add('pressing');
-            pressTimer = setTimeout(openEnvelope, 1000); // 按住 1 秒开启
-        }
-        function endPress() {
-            sealBtn.classList.remove('pressing');
-            clearTimeout(pressTimer);
-        }
-
-        sealBtn.addEventListener('touchstart', startPress);
-        sealBtn.addEventListener('touchend', endPress);
-        sealBtn.addEventListener('mousedown', startPress); // 适配电脑调试
-        sealBtn.addEventListener('mouseup', endPress);
-
-        function openEnvelope() {
-            if (env.classList.contains('is-open')) return;
-            env.classList.add('is-open');
-            document.getElementById('env-label').style.display = 'none';
-            document.getElementById('letter-content').style.display = 'block';
-            document.getElementById('bgAudio').play().catch(() => {});
-            document.getElementById('music-control').classList.add('playing');
-            
-            setTimeout(() => {
-                typeWriter(config.text, 0, () => {
-                    document.getElementById('giftBtn').style.display = 'flex';
-                });
-            }, 800);
-        }
-
+        // 2. 打字机函数
         function typeWriter(text, i, fnCallback) {
             if (i < text.length) {
                 document.getElementById("typewriter").innerHTML = text.substring(0, i+1) + '<span style="color:var(--env-color)">|</span>';
-                setTimeout(() => typeWriter(text, i + 1, fnCallback), 80);
-            } else if (typeof fnCallback == 'function') fnCallback();
+                setTimeout(() => typeWriter(text, i + 1, fnCallback), 100);
+            } else {
+                document.getElementById("typewriter").innerHTML = text;
+                if (typeof fnCallback == 'function') fnCallback();
+            }
         }
 
-        // 4. 撒花
-        document.getElementById('giftBtn').onclick = (e) => {
-            e.stopPropagation();
-            confetti({ particleCount: 100, spread: 60, origin: { y: 0.7 } });
-            // 手机端震动反馈 (部分安卓支持)
-            if (navigator.vibrate) navigator.vibrate(50);
+        // 3. 交互逻辑
+        const env = document.getElementById('mainEnvelope');
+        const audio = document.getElementById('bgAudio');
+        const musicCtrl = document.getElementById('music-control');
+
+        env.onclick = function(e) {
+            // 排除关闭按钮点击
+            if (this.classList.contains('is-open') || e.target.id === 'close-btn') return;
+            
+            this.classList.add('is-open');
+            document.getElementById('env-label').style.display = 'none';
+            document.getElementById('letter-content').style.display = 'block';
+            audio.play().catch(() => {});
+            musicCtrl.classList.add('playing');
+            
+            setTimeout(() => {
+                typeWriter(config.text, 0);
+            }, 800);
         };
 
         document.getElementById('close-btn').onclick = (e) => {
-            e.stopPropagation();
+            e.stopPropagation(); // 阻止触发信封的 onclick 重新开启
             env.classList.remove('is-open');
             setTimeout(() => {
                 document.getElementById('env-label').style.display = 'block';
                 document.getElementById('letter-content').style.display = 'none';
-                document.getElementById('typewriter').innerHTML = "";
+                document.getElementById("typewriter").innerHTML = "";
             }, 800);
+        };
+
+        musicCtrl.onclick = function(e) {
+            e.stopPropagation();
+            if (audio.paused) { 
+                audio.play(); 
+                this.classList.add('playing'); 
+            } else { 
+                audio.pause(); 
+                this.classList.remove('playing'); 
+            }
         };
     </script>
 </body>
+</html>
+</body>
+
 </html>

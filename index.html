@@ -9,73 +9,50 @@
             --paper-color: #fff9e6;
             --env-color: #c0392b;
             --env-flap: #e74c3c;
-            /* 固定为你指定的色号 */
             --bg-1: #fdaffa; 
             --bg-2: #b4df9b; 
             --bg-3: #b6cdad;
         }
 
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; display: flex; justify-content: center; align-items: center; 
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; display: flex; justify-content: center; align-items: center; font-family: "Microsoft YaHei", sans-serif; }
 
-        /* --- 渐变波浪背景 --- */
-        .wave-bg {
-            position: fixed; top: 0; left: 0; 
-            width: 400%; height: 100%;
-            background: linear-gradient(90deg, var(--bg-1), var(--bg-2), var(--bg-3), var(--bg-1));
-            background-size: 25% 100%;
-            z-index: -2;
-            animation: waveFlow 15s linear infinite;
-        }
+        /* 背景动画 */
+        .wave-bg { position: fixed; top: 0; left: 0; width: 400%; height: 100%; background: linear-gradient(90deg, var(--bg-1), var(--bg-2), var(--bg-3), var(--bg-1)); background-size: 25% 100%; z-index: -2; animation: waveFlow 15s linear infinite; }
         @keyframes waveFlow { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        /* --- 一闪一闪星空层 --- */
-        #star-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; pointer-events: none;
-        }
-        .star-text {
-            position: absolute; color: rgba(255,255,255,0.8); font-weight: bold;
-            opacity: 0; animation: twinkle var(--duration) ease-in-out infinite;
-        }
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.1; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1.1); }
-        }
+        /* 星空层 */
+        #star-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        .star-text { position: absolute; color: rgba(255,255,255,0.8); font-weight: bold; opacity: 0; animation: twinkle var(--duration) ease-in-out infinite; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.1; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.1); } }
 
-        /* --- 信封 UI --- */
-        .envelope-container {
-            position: relative; width: 280px; height: 180px;
-            background: var(--env-color); cursor: pointer; z-index: 100;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 15px 45px rgba(0,0,0,0.2);
-            display: flex; justify-content: center; align-items: center;
+        /* --- 照片弹出层：已设置为 0.5s 渐变 --- */
+        #photo-overlay {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 80%; max-width: 320px; padding: 10px; background: white;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 2000;
+            opacity: 0; 
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s; /* 0.5秒淡入/淡出 */
+            border-radius: 4px; text-align: center;
         }
-        .envelope-container::before {
-            content: ""; position: absolute; top: 0; left: 0;
-            border-left: 140px solid transparent; border-right: 140px solid transparent;
-            border-top: 100px solid var(--env-flap);
-            transform-origin: top; transition: 0.5s; z-index: 4;
-        }
-        /* 手机端适配宽度 */
-        .envelope-container.is-open {
-            width: 85vw; height: 70vh; background: var(--paper-color);
-            cursor: default; flex-direction: column; padding: 40px 20px; box-sizing: border-box; border-radius: 8px;
-        }
+        #photo-overlay.show { opacity: 1; visibility: visible; }
+        #photo-overlay img { width: 100%; height: auto; border-radius: 2px; display: block; }
+
+        /* 信封 UI */
+        .envelope-container { position: relative; width: 280px; height: 180px; background: var(--env-color); cursor: pointer; z-index: 100; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 15px 45px rgba(0,0,0,0.2); display: flex; justify-content: center; align-items: center; }
+        .envelope-container::before { content: ""; position: absolute; top: 0; left: 0; border-left: 140px solid transparent; border-right: 140px solid transparent; border-top: 100px solid var(--env-flap); transform-origin: top; transition: 0.5s; z-index: 4; }
+        .envelope-container.is-open { width: 90vw; height: 85vh; background: var(--paper-color); cursor: default; flex-direction: column; padding: 20px; box-sizing: border-box; border-radius: 8px; }
         .envelope-container.is-open::before { transform: rotateX(180deg); opacity: 0; }
 
-        #typewriter { font-size: 1.15rem; color: #333; line-height: 2; text-align: center; white-space: pre-wrap; margin-top: 20px; }
-        
-        #close-btn { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; background: none; border: none; color: #999; display: none; }
-        .envelope-container.is-open #close-btn { display: block; }
+        /* 内容区域 */
+        #letter-content { display: none; width: 100%; height: 100%; flex-direction: column; overflow: hidden; }
+        #scroll-wrapper { flex: 1; overflow-y: auto; padding: 10px; scroll-behavior: smooth; }
+        #scroll-wrapper::-webkit-scrollbar { width: 4px; }
+        #scroll-wrapper::-webkit-scrollbar-thumb { background: var(--env-color); border-radius: 10px; }
+        #typewriter { font-size: 1.05rem; color: #444; line-height: 1.8; text-align: left; white-space: pre-wrap; padding-bottom: 50px; }
 
-        #music-control {
-            position: fixed; top: 20px; right: 20px; width: 40px; height: 40px; z-index: 1000;
-            cursor: pointer; border-radius: 50%; background: rgba(255,255,255,0.3);
-            display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);
-        }
+        #close-btn { position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer; background: none; border: none; color: #999; z-index: 200; }
+        #music-control { position: fixed; top: 20px; right: 20px; width: 40px; height: 40px; z-index: 1000; cursor: pointer; border-radius: 50%; background: rgba(255,255,255,0.3); display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         #music-control.playing { animation: rotateDisk 5s linear infinite; }
         @keyframes rotateDisk { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
@@ -84,72 +61,140 @@
 
     <div class="wave-bg"></div>
     <div id="star-container"></div>
+    <div id="photo-overlay"><img id="pop-photo" src="" alt="我们的回忆"></div>
 
     <audio id="bgAudio" src="bg-music.mp3" loop></audio>
     <div id="music-control">♪</div>
 
     <div class="envelope-container" id="mainEnvelope">
-        <span id="env-label" style="color:#FFD700; z-index:5; font-size: 1.2rem; letter-spacing: 2px;">开启 2026 祝福</span>
+        <span id="env-label" style="color:#FFD700; z-index:5; font-size: 1.2rem; letter-spacing: 2px;">2026年 新年快乐</span>
         <button id="close-btn">✕</button>
-        <div id="letter-content" style="display:none; width:100%;">
-            <h2 style="color:var(--env-color); text-align:center; margin-top:0;">致：东、欣</h2>
-            <div id="typewriter"></div>
+        <div id="letter-content">
+            <h2 style="color:var(--env-color); text-align:center; margin-top:10px; font-size: 1.3rem;">致我的唯一挚爱 欣</h2>
+            <div id="scroll-wrapper">
+                <div id="typewriter"></div>
+            </div>
         </div>
     </div>
 
     <script>
         const config = {
-            text: "亲爱的朋友：\n\n新年的钟声即将敲响，所有的过往皆为序章。\n愿这封信随着温柔的波浪，带去我最真挚的祝福。\n生活如诗，岁月如画。\n愿 2026 年的你，万事胜意，不负韶华。"
+            text: `我的宝贝欣欣：
+
+第一次给你送花是2025年8月29号，情不知所起，但一往情深，你说好看好看，开心开心，开心就好开心就好哈哈，你给我拍的照片，我也很喜欢，你爱我我爱你，蜜雪冰城甜蜜蜜~
+第一次见面是2025年9月19号，很怕出错，但是到了机场等你的时候，又变成了迫切想要见到你的心情。当我在人流中一眼认出你的时候，那种怦然心动的感觉，现在回想起来心里还是暖暖的。
+第一次和你牵手也是在这一天，其实我那天心里真的很害怕，害怕你对我不满意。你用力牵着我的手的时候，我真的不敢看你，也是真的害羞，但是心里真的好开心。
+亲吻是什么感觉，和我亲亲的时候你在想什么呢？大脑一片空白，亲着亲自就上手了，你问我心里在想什么，我也不知道当时脑子里在想什么了，可能已经无法思考了。干你的时候真的很爽啊。喜欢我干你的时候你叫我的名字，叫我老公，叫我爸爸。
+2025年9月20号，我们第一次约会，去看了场电影，奇妙的感觉。下着小雨，和你撑着伞走在路上，大半夜的，感觉也是很微妙的，看电影的时候我一直握着你的手，我的手暖吗？
+看完以后就是2025年9月21日了，我的生日，唔你问我想要什么生日礼物，我也确实不知道，我只知道此时此刻你在我身边，就是我最好的礼物，感谢你，让我度过了一个此生难忘的生日。
+第一次和你逛商场吃饭是2025年9月22日，慢慢的逛慢慢的走，一边走一边闲聊，我不讨厌这种感觉，我很喜欢和你呆在一起的时候，可以全身心放松什么都不需要想，吃饭的时候给你拍照片，想要记录下我们的点点滴滴，自己一个人看照片想念你的时候，也是很开心的，漫步江边的时候和你有说有笑，也成为了我很珍贵的一段回忆，看看广州塔我们拍了比心，这个做了我很长一段时间的手机壁纸，想到什么说什么，回去的时候拍到了我最喜欢的照片030
+腿都走疼了，还有老婆给我按脚，不嫌弃我的脚丫子，那时候觉得自己是世界上最幸福的男人一个(没有说现在不是的意思)
+你躺在我怀里睡觉的时候，也是很可爱的，完全就是世界上最可爱的宝宝一个，谁能忍住不亲一嘴？
+
+再见面的时候已经是国庆了，干了个爽，老婆也是不辞辛苦不远万里的来到我身边，国庆加班的疲劳一扫而空，这个国庆也过得很充实很开心
+在广州生活这么久，我就天天呆在自己家里那个一亩三分地，没有老婆和我一起，我可能很久很久都不会来到这些地方，永庆坊这个地方拍照有说法的，没有美颜的照片一下就给你否了，但是在我心里，有没有美颜对我来说，你的美丽都是无可挑剔的。
+后来我们一路从永庆坊走到圣心大教堂，在走到上下九，走到北京路，去看到了这个打卡点，经常有在抖音刷到，但是和你一起来到这个地方，也是很有意义的。
+和老婆一起吃火锅，老婆说喜欢和我并排坐，喜欢把脚搭在我的腿上吃东西，这个我也是有一直记在心里
+第一次和老婆一起逛公园是2025年10月14日，我还穿着自己的工装，我真的很不好意思，我怕别人看到了笑话我们，都不敢牵你的手，但是你也是毅然决然的拖着我的手，安心，很安心，给老婆拍的美美的照片~
+
+第一次去到老婆的地方是2025年11月24日，第一次自己一个人坐飞机，真的好紧张呀，一下飞机给我冻成呆逼了，全身上下嘴最硬的说，来这里吃的第一口东西是老婆给我点的酱大骨，不知道为什么去到你的地方我就感觉不到饿，还有我们的满口香稍美大人，香喷喷美滋滋，两个人吃那么点说出去笑死人，晚上还尝到了内蒙古烧烤，其实感觉这个倒是和别处没有太大区别，但是和老婆在一起吃意义就不一样啦，老婆把我养的很好，吃的东西都很好吃
+第一次去宝宝家是2025年12月21日，真的给我美到了，在你家不穿裤子裸奔的感觉，哈哈哈，也见到了㵘㵘这只猫咪，不过好像也没有怎么摸它，不过一回生二回熟嘛，争取下次可以抱抱它，在宝宝家里睡觉的感觉，也是很微妙的。
+第一次亲手给你送花是2025年12月21日，我不是一个很浪漫的人，但是为了你我也会想尽办法的去给到你仪式感，这个积木花也代表我对你永恒的爱！
+
+还有很多第一次..已经写不过来了，手机里全是你的照片，不过我想说的是，我很感谢也很珍惜有你，我还有更多的第一次想要和你尝试，还有很多的姿势想要和你体验，我对你的爱永远是加法，你可以随时向我确认我的决心。谢谢你看到这里。
+
+爱你的东~
+
+
+
+`,
+
+            photoTriggers: [
+                { keyword: "第一次给你送花", url: "flower.jpg" }, 
+                { keyword: "吃饭的时候给你拍照片", url: "fan.jpg" },
+                { keyword: "漫步江边", url: "jiangbian.jpg" },
+                { keyword: "030", url: "zxh.jpg" },
+                { keyword: "拍了比心", url: "bixin.jpg" },
+                { keyword: "按脚", url: "anjiao.jpg" },
+                { keyword: "怀里睡觉", url: "hlsj.jpg" },
+                { keyword: "拍照有说法的", url: "yqf.jpg" },
+                { keyword: "打卡点", url: "dkd.jpg" },
+                { keyword: "腿上吃东西", url: "tuishang.jpg" },
+                { keyword: "美美的照片", url: "lhh.jpg" },
+                { keyword: "满口香稍美大人", url: "mk.jpg" },
+                { keyword: "烧烤", url: "sk.jpg" },
+                { keyword: "永恒的爱", url: "yhda.jpg" }
+            ]
         };
 
-        // 1. 生成星空文字
         const starContainer = document.getElementById('star-container');
         const words = ["东", "欣", "2026", "✨", "❤️"];
         for (let i = 0; i < 50; i++) {
-            const s = document.createElement('div');
-            s.className = 'star-text';
+            const s = document.createElement('div'); s.className = 'star-text';
             s.innerText = words[Math.floor(Math.random() * words.length)];
-            s.style.left = Math.random() * 100 + "%";
-            s.style.top = Math.random() * 100 + "%";
+            s.style.left = Math.random() * 100 + "%"; s.style.top = Math.random() * 100 + "%";
             s.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
             s.style.setProperty('--delay', (Math.random() * 5) + 's');
             starContainer.appendChild(s);
         }
 
-        // 2. 打字机函数
+        let shownPhotos = new Set(); 
+
         function typeWriter(text, i, fnCallback) {
+            const typewriterEl = document.getElementById("typewriter");
+            const scrollWrapper = document.getElementById("scroll-wrapper");
+
             if (i < text.length) {
-                document.getElementById("typewriter").innerHTML = text.substring(0, i+1) + '<span style="color:var(--env-color)">|</span>';
-                setTimeout(() => typeWriter(text, i + 1, fnCallback), 100);
+                const currentText = text.substring(0, i+1);
+                typewriterEl.innerHTML = currentText + '<span style="color:var(--env-color)">|</span>';
+                scrollWrapper.scrollTop = scrollWrapper.scrollHeight;
+
+                config.photoTriggers.forEach(item => {
+                    if (currentText.endsWith(item.keyword) && !shownPhotos.has(item.keyword)) {
+                        showPopPhoto(item.url, item.keyword);
+                    }
+                });
+                
+                setTimeout(() => typeWriter(text, i + 1, fnCallback), 80);
             } else {
-                document.getElementById("typewriter").innerHTML = text;
+                typewriterEl.innerHTML = text;
                 if (typeof fnCallback == 'function') fnCallback();
             }
         }
 
-        // 3. 交互逻辑
+        // --- 核心修改：2.5秒总时长控制 ---
+        function showPopPhoto(url, key) {
+            const overlay = document.getElementById('photo-overlay');
+            const img = document.getElementById('pop-photo');
+            img.src = url;
+            
+            overlay.classList.add('show'); 
+            shownPhotos.add(key);
+
+            // 2.0s后触发淡出，加上CSS中的0.5s淡出时间，总时长正好 2.5s
+            setTimeout(() => {
+                overlay.classList.remove('show');
+            }, 2000); 
+        }
+
         const env = document.getElementById('mainEnvelope');
         const audio = document.getElementById('bgAudio');
         const musicCtrl = document.getElementById('music-control');
 
         env.onclick = function(e) {
-            // 排除关闭按钮点击
             if (this.classList.contains('is-open') || e.target.id === 'close-btn') return;
-            
             this.classList.add('is-open');
             document.getElementById('env-label').style.display = 'none';
-            document.getElementById('letter-content').style.display = 'block';
+            document.getElementById('letter-content').style.display = 'flex';
             audio.play().catch(() => {});
             musicCtrl.classList.add('playing');
-            
-            setTimeout(() => {
-                typeWriter(config.text, 0);
-            }, 800);
+            setTimeout(() => { typeWriter(config.text, 0); }, 800);
         };
 
         document.getElementById('close-btn').onclick = (e) => {
-            e.stopPropagation(); // 阻止触发信封的 onclick 重新开启
+            e.stopPropagation();
             env.classList.remove('is-open');
+            shownPhotos.clear(); 
             setTimeout(() => {
                 document.getElementById('env-label').style.display = 'block';
                 document.getElementById('letter-content').style.display = 'none';
@@ -159,17 +204,9 @@
 
         musicCtrl.onclick = function(e) {
             e.stopPropagation();
-            if (audio.paused) { 
-                audio.play(); 
-                this.classList.add('playing'); 
-            } else { 
-                audio.pause(); 
-                this.classList.remove('playing'); 
-            }
+            if (audio.paused) { audio.play(); this.classList.add('playing'); }
+            else { audio.pause(); this.classList.remove('playing'); }
         };
     </script>
 </body>
-</html>
-</body>
-
 </html>
